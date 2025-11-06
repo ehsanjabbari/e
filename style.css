@@ -515,6 +515,42 @@ input[type="text"] {
     }
 }
 
+/* Settings Form Styles */
+.settings-group {
+    margin-bottom: 16px;
+}
+
+.settings-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #18181B;
+}
+
+.settings-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.settings-input:focus {
+    outline: none;
+    border-color: #007AFF;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.settings-help {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6B7280;
+    line-height: 1.4;
+}
+
 @media (max-width: 768px) {
     .mobile-menu-btn {
         display: flex;
@@ -668,8 +704,15 @@ select:focus {
     font-size: 14px;
 }
 
+.gist-info h4 {
+    color: #007AFF;
+    margin: 0 0 10px 0;
+    font-size: 16px;
+}
+
 .gist-info p {
     margin: 8px 0 4px 0;
+    line-height: 1.4;
 }
 
 .gist-info ol {

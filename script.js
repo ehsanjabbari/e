@@ -5,8 +5,7 @@ let appState = {
     sales151: [],
     sales168: [],
     settings: {
-        gistId: '',
-        gistFilename: 'inventory-data.json'
+        gistFilename: 'inventory-backup.json'
     }
 };
 
@@ -851,7 +850,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Backup and Restore
+// Backup and Restore - Updated for GitHub Upload
 function backupData() {
     try {
         const data = JSON.stringify(appState, null, 2);
@@ -860,7 +859,8 @@ function backupData() {
         
         const a = document.createElement('a');
         a.href = url;
-        a.download = `inventory-backup-${formatDateToPersian(new Date('2024-10-27'))}.json`;
+        const currentDate = formatDateToPersian(new Date('2024-10-27'));
+        a.download = `inventory-backup-${currentDate}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -903,205 +903,350 @@ function restoreData(file) {
     reader.readAsText(file);
 }
 
-// GitHub Gist Integration
-async function backupToGist() {
-    const gistId = document.getElementById('gist-id').value.trim();
-    const filename = document.getElementById('gist-filename').value.trim() || 'inventory-data.json';
-    
-    if (!gistId) {
-        showNotification('شناسه Gist را وارد کنید', 'warning');
-        return;
+// Enhanced GitHub Integration with Gists
+class GitHubGistManager {
+    constructor() {
+        this.token = '';
+        this.gistId = '';
+        this.baseURL = 'https://api.github.com';
     }
-    
-    const statusElement = document.getElementById('gist-status');
-    statusElement.textContent = 'در حال بکاپ در Gist...';
-    statusElement.className = 'status-message';
-    
-    try {
-        // Save settings
-        appState.settings = { gistId, gistFilename: filename };
-        saveData();
-        
-        // Create JSON data
-        const data = JSON.stringify(appState, null, 2);
-        
-        // Update Gist via API
-        const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-            method: 'PATCH',
-            headers: {
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                description: `Inventory backup - ${formatDateToPersian(new Date('2024-10-27'))}`,
-                files: {
-                    [filename]: {
-                        content: data
-                    }
-                }
-            })
-        });
-        
-        if (response.ok) {
-            const gistData = await response.json();
-            const gistUrl = gistData.html_url;
-            
-            statusElement.innerHTML = `
-                <div class="gist-success">
-                    <p>✅ بکاپ با موفقیت انجام شد!</p>
-                    <p><a href="${gistUrl}" target="_blank" style="color: #007AFF; text-decoration: none;">
-                        <i data-lucide="external-link"></i> مشاهده Gist
-                    </a></p>
-                    <p style="font-size: 12px; color: #666;">شناسه: ${gistId}</p>
-                </div>
-            `;
-            statusElement.className = 'status-message success';
-            showNotification('بکاپ با موفقیت در Gist ذخیره شد', 'success');
-            
-            // Refresh icons
-            lucide.createIcons();
-        } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'خطا در Gist API');
+
+    // Set token securely (user can input this in UI)
+    setToken(token) {
+        this.token = token;
+    }
+
+    // Set Gist ID
+    setGistId(gistId) {
+        this.gistId = gistId;
+    }
+
+    // Create a new Gist
+    async createNewGist() {
+        if (!this.token) {
+            throw new Error('توکن GitHub تنظیم نشده است');
         }
-    } catch (error) {
-        console.error('Gist backup error:', error);
-        statusElement.textContent = `خطا: ${error.message}`;
-        statusElement.className = 'status-message error';
-        showNotification(`خطا در بکاپ: ${error.message}`, 'error');
+
+        const data = {
+            description: `Inventory Backup - ${new Date().toLocaleString('fa-IR')}`,
+            public: true, // Public gist for easy access
+            files: {
+                'inventory-backup.json': {
+                    content: this.getCurrentData()
+                }
+            }
+        };
+
+        try {
+            const response = await fetch(`${this.baseURL}/gists`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${this.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'خطا در ایجاد Gist');
+            }
+
+            const gist = await response.json();
+            this.gistId = gist.id;
+            return {
+                success: true,
+                gistId: gist.id,
+                gistUrl: gist.html_url
+            };
+        } catch (error) {
+            console.error('خطا در ایجاد Gist:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    // Update existing Gist
+    async updateGist() {
+        if (!this.token) {
+            throw new Error('توکن GitHub تنظیم نشده است');
+        }
+
+        if (!this.gistId) {
+            throw new Error('شناسه Gist تنظیم نشده است');
+        }
+
+        const data = {
+            files: {
+                'inventory-backup.json': {
+                    content: this.getCurrentData()
+                }
+            }
+        };
+
+        try {
+            const response = await fetch(`${this.baseURL}/gists/${this.gistId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `token ${this.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'خطا در بروزرسانی Gist');
+            }
+
+            return {
+                success: true,
+                message: 'بکاپ با موفقیت به Gist ارسال شد'
+            };
+        } catch (error) {
+            console.error('خطا در بروزرسانی Gist:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    // Load data from Gist
+    async loadFromGist() {
+        if (!this.gistId) {
+            throw new Error('شناسه Gist تنظیم نشده است');
+        }
+
+        try {
+            // For public gists, we can use the public API without token
+            const response = await fetch(`${this.baseURL}/gists/${this.gistId}`);
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'خطا در دریافت اطلاعات Gist');
+            }
+
+            const gist = await response.json();
+            
+            // Find the inventory-backup.json file
+            const backupFile = gist.files['inventory-backup.json'];
+            if (!backupFile) {
+                throw new Error('فایل inventory-backup.json در Gist پیدا نشد');
+            }
+
+            const data = JSON.parse(backupFile.content);
+            return {
+                success: true,
+                data: data
+            };
+        } catch (error) {
+            console.error('خطا در بارگیری از Gist:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    // Helper method to get current app data
+    getCurrentData() {
+        return JSON.stringify({
+            products: appState.products,
+            inputInvoices: appState.inputInvoices,
+            sales151: appState.sales151,
+            sales168: appState.sales168,
+            timestamp: new Date().toISOString()
+        }, null, 2);
     }
 }
 
-async function loadFromGist() {
-    const gistId = document.getElementById('gist-id').value.trim();
-    const filename = document.getElementById('gist-filename').value.trim() || 'inventory-data.json';
+// Initialize GitHub Gist Manager
+const gistManager = new GitHubGistManager();
+
+// GitHub Gist Integration Functions
+async function backupToGitHubGist() {
+    // Load saved settings
+    const token = localStorage.getItem('githubToken') || '';
+    const gistId = localStorage.getItem('githubGistId') || '';
     
-    if (!gistId) {
-        showNotification('شناسه Gist را وارد کنید', 'warning');
+    if (!token) {
+        showNotification('لطفاً توکن GitHub را در تنظیمات وارد کنید', 'error');
         return;
     }
-    
-    const statusElement = document.getElementById('gist-status');
-    statusElement.textContent = 'در حال بارگیری از Gist...';
-    statusElement.className = 'status-message';
-    
+
+    gistManager.setToken(token);
+    gistManager.setGistId(gistId);
+
+    showNotification('در حال ارسال بکاپ به GitHub...', 'info');
+
     try {
-        // Fetch Gist data
-        const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-            headers: {
-                'Accept': 'application/vnd.github.v3+json'
-            }
-        });
+        // Try to update existing Gist, or create new one
+        let result;
+        if (gistId) {
+            result = await gistManager.updateGist();
+        } else {
+            result = await gistManager.createNewGist();
+        }
         
-        if (response.ok) {
-            const gistData = await response.json();
-            const fileData = gistData.files[filename];
+        if (result.success) {
+            showNotification('بکاپ با موفقیت به GitHub Gist ارسال شد!', 'success');
             
-            if (!fileData) {
-                throw new Error(`فایل ${filename} در Gist یافت نشد`);
+            // Save the new Gist ID
+            if (result.gistId) {
+                localStorage.setItem('githubGistId', result.gistId);
+                if (result.gistUrl) {
+                    localStorage.setItem('lastGistUrl', result.gistUrl);
+                }
             }
             
-            // Parse and load data
-            const data = JSON.parse(fileData.content);
+            // Also save to local file as backup
+            backupData();
             
-            // Validate data structure
-            if (!data.products || !data.inputInvoices || !data.sales151 || !data.sales168) {
-                throw new Error('فرمت فایل صحیح نیست');
-            }
-            
-            appState = { ...appState, ...data };
+        } else {
+            showNotification(`خطا: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('خطا در بکاپ GitHub:', error);
+        showNotification('خطا در ارسال بکاپ به GitHub', 'error');
+    }
+}
+
+async function loadFromGitHubGist() {
+    const token = localStorage.getItem('githubToken') || '';
+    const gistId = localStorage.getItem('githubGistId') || '';
+    
+    if (!gistId) {
+        showNotification('شناسه Gist پیدا نشد. ابتدا بکاپ ایجاد کنید.', 'error');
+        return;
+    }
+
+    gistManager.setToken(token);
+    gistManager.setGistId(gistId);
+
+    showNotification('در حال بارگیری بکاپ از GitHub...', 'info');
+
+    try {
+        const result = await gistManager.loadFromGist();
+        
+        if (result.success) {
+            // Merge the loaded data with current state
+            appState = { ...appState, ...result.data };
             saveData();
             
-            // Refresh all tables
+            // Refresh all displays
             renderProducts();
             renderInputInvoices();
             renderSales151();
             renderSales168();
             renderInventory();
             
-            statusElement.textContent = '✅ بارگیری با موفقیت انجام شد';
-            statusElement.className = 'status-message success';
-            showNotification('اطلاعات با موفقیت از Gist بارگیری شد', 'success');
+            showNotification('بازیابی از GitHub با موفقیت انجام شد!', 'success');
         } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'خطا در دسترسی به Gist');
+            showNotification(`خطا: ${result.error}`, 'error');
         }
     } catch (error) {
-        console.error('Gist load error:', error);
-        statusElement.textContent = `خطا: ${error.message}`;
-        statusElement.className = 'status-message error';
-        showNotification(`خطا در بارگیری: ${error.message}`, 'error');
+        console.error('خطا در بارگیری از GitHub:', error);
+        showNotification('خطا در بارگیری بکاپ از GitHub', 'error');
     }
 }
 
 async function createNewGist() {
+    const token = localStorage.getItem('githubToken') || '';
+    
+    if (!token) {
+        showNotification('لطفاً ابتدا توکن GitHub را در تنظیمات وارد کنید', 'error');
+        return;
+    }
+
+    gistManager.setToken(token);
+    gistManager.setGistId(''); // Clear existing Gist ID
+
+    showNotification('در حال ایجاد Gist جدید...', 'info');
+
     try {
-        const data = JSON.stringify(appState, null, 2);
-        const filename = document.getElementById('gist-filename').value.trim() || 'inventory-data.json';
+        const result = await gistManager.createNewGist();
         
-        // Create new Gist
-        const response = await fetch('https://api.github.com/gists', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                description: `Inventory backup - ${formatDateToPersian(new Date('2024-10-27'))}`,
-                public: true, // Public Gist for easy sharing
-                files: {
-                    [filename]: {
-                        content: data
-                    }
-                }
-            })
-        });
-        
-        if (response.ok) {
-            const gistData = await response.json();
-            const gistId = gistData.id;
-            const gistUrl = gistData.html_url;
-            
-            // Update form with new Gist ID
-            document.getElementById('gist-id').value = gistId;
-            
-            // Save settings
-            appState.settings = { gistId, gistFilename: filename };
-            saveData();
-            
-            const statusElement = document.getElementById('gist-status');
-            statusElement.innerHTML = `
-                <div class="gist-success">
-                    <p>✅ Gist جدید ایجاد شد!</p>
-                    <p><a href="${gistUrl}" target="_blank" style="color: #007AFF; text-decoration: none;">
-                        <i data-lucide="external-link"></i> مشاهده Gist
-                    </a></p>
-                    <p style="font-size: 12px; color: #666;">شناسه: ${gistId}</p>
-                    <p style="font-size: 12px; color: #666;">لینک اشتراک‌گذاری: ${gistUrl}</p>
-                </div>
-            `;
-            statusElement.className = 'status-message success';
-            showNotification('Gist جدید با موفقیت ایجاد شد', 'success');
-            
-            // Refresh icons
-            lucide.createIcons();
+        if (result.success) {
+            showNotification('Gist جدید با موفقیت ایجاد شد!', 'success');
+            localStorage.setItem('githubGistId', result.gistId);
+            localStorage.setItem('lastGistUrl', result.gistUrl);
         } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'خطا در ایجاد Gist');
+            showNotification(`خطا: ${result.error}`, 'error');
         }
     } catch (error) {
-        console.error('Create Gist error:', error);
-        const statusElement = document.getElementById('gist-status');
-        statusElement.textContent = `خطا: ${error.message}`;
-        statusElement.className = 'status-message error';
-        showNotification(`خطا در ایجاد Gist: ${error.message}`, 'error');
+        console.error('خطا در ایجاد Gist:', error);
+        showNotification('خطا در ایجاد Gist', 'error');
     }
 }
 
-// Load Gist settings
-function loadGistSettings() {
-    document.getElementById('gist-id').value = appState.settings.gistId || '';
-    document.getElementById('gist-filename').value = appState.settings.gistFilename || 'inventory-data.json';
+function saveGitHubSettings() {
+    const token = document.getElementById('github-token')?.value.trim();
+    const gistId = document.getElementById('github-gist-id')?.value.trim();
+    
+    if (token) {
+        localStorage.setItem('githubToken', token);
+    }
+    
+    if (gistId) {
+        localStorage.setItem('githubGistId', gistId);
+    }
+    
+    showNotification('تنظیمات GitHub ذخیره شد', 'success');
+}
+        const data = JSON.stringify(appState, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `gist-backup-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        const statusElement = document.getElementById('gist-status');
+        statusElement.innerHTML = `
+            <div class="gist-info">
+                <h4>📋 راهنمای اشتراک‌گذاری</h4>
+                <p>✅ فایل بکاپ دانلود شد</p>
+                <p>1. این فایل را برای همکارانتان ارسال کنید</p>
+                <p>2. آنها فایل را در وب اپ خود بارگیری کنند</p>
+                <p>3. داده‌ها همگام‌سازی می‌شوند</p>
+                <p><strong>نکته:</strong> برای آپلود در GitHub مشکلی نیست!</p>
+                <p><strong>مزیت:</strong> بدون نیاز به API، توکن یا احراز هویت</p>
+            </div>
+        `;
+        statusElement.className = 'status-message success';
+        showNotification('فایل بکاپ برای اشتراک‌گذاری آماده شد', 'success');
+    } catch (error) {
+        console.error('Create backup error:', error);
+        showNotification('خطا در ایجاد بکاپ', 'error');
+    }
+}
+
+// Initialize GitHub settings
+function loadGitHubSettings() {
+    // This function loads and displays saved GitHub settings
+    const token = localStorage.getItem('githubToken');
+    const gistId = localStorage.getItem('githubGistId');
+    
+    // Update form fields if they exist
+    const tokenInput = document.getElementById('github-token');
+    const gistIdInput = document.getElementById('github-gist-id');
+    
+    if (tokenInput && token) {
+        tokenInput.value = token;
+    }
+    
+    if (gistIdInput && gistId) {
+        gistIdInput.value = gistId;
+    }
 }
 
 // Button Event Listeners
@@ -1124,11 +1269,6 @@ function initializeButtonHandlers() {
             restoreData(e.target.files[0]);
         }
     });
-    
-    // GitHub Gist actions
-    document.getElementById('sync-gist').addEventListener('click', backupToGist);
-    document.getElementById('load-gist').addEventListener('click', loadFromGist);
-    document.getElementById('create-gist').addEventListener('click', createNewGist);
 }
 
 // Mobile Menu Management
@@ -1179,7 +1319,7 @@ function initializeApp() {
     initializeTabs();
     initializeModalHandlers();
     initializeButtonHandlers();
-    loadGistSettings();
+    loadGitHubSettings();
     
     // Initial render
     renderProducts();
