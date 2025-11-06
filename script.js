@@ -859,7 +859,7 @@ function backupData() {
         
         const a = document.createElement('a');
         a.href = url;
-        const currentDate = formatDateToPersian(new Date('2024-10-27'));
+        const currentDate = new Date().toLocaleDateString('fa-IR').replace(/\//g, '-');
         a.download = `inventory-backup-${currentDate}.json`;
         document.body.appendChild(a);
         a.click();
@@ -1155,7 +1155,8 @@ async function loadFromGitHubGist() {
     }
 }
 
-async function createNewGist() {
+// Create new Gist from UI
+async function createNewGitHubGist() {
     const token = localStorage.getItem('githubToken') || '';
     
     if (!token) {
@@ -1197,37 +1198,6 @@ function saveGitHubSettings() {
     }
     
     showNotification('تنظیمات GitHub ذخیره شد', 'success');
-}
-        const data = JSON.stringify(appState, null, 2);
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `gist-backup-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        const statusElement = document.getElementById('gist-status');
-        statusElement.innerHTML = `
-            <div class="gist-info">
-                <h4>📋 راهنمای اشتراک‌گذاری</h4>
-                <p>✅ فایل بکاپ دانلود شد</p>
-                <p>1. این فایل را برای همکارانتان ارسال کنید</p>
-                <p>2. آنها فایل را در وب اپ خود بارگیری کنند</p>
-                <p>3. داده‌ها همگام‌سازی می‌شوند</p>
-                <p><strong>نکته:</strong> برای آپلود در GitHub مشکلی نیست!</p>
-                <p><strong>مزیت:</strong> بدون نیاز به API، توکن یا احراز هویت</p>
-            </div>
-        `;
-        statusElement.className = 'status-message success';
-        showNotification('فایل بکاپ برای اشتراک‌گذاری آماده شد', 'success');
-    } catch (error) {
-        console.error('Create backup error:', error);
-        showNotification('خطا در ایجاد بکاپ', 'error');
-    }
 }
 
 // Initialize GitHub settings

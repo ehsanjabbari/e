@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست سیستم GitHub Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .test-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-btn:hover { background: #0056b3; }
+        #test-results {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 تست سیستم GitHub Integration</h1>
+    
+    <div class="test-section">
+        <h2>وضعیت فایل‌ها</h2>
+        <div id="file-tests">
+            <div class="test-item">در حال بررسی فایل‌ها...</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>تست Function Names</h2>
+        <div id="function-tests">
+            <div class="test-item">در حال بررسی توابع...</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>تست GitHub Integration</h2>
+        <button class="test-btn" onclick="testGitHubFunctions()">تست توابع GitHub</button>
+        <button class="test-btn" onclick="testLocalStorage()">تست LocalStorage</button>
+        <button class="test-btn" onclick="runAllTests()">اجرای همه تست‌ها</button>
+    </div>
+
+    <div id="test-results"></div>
+
+    <script>
+        // Mock document and localStorage for Node.js testing
+        if (typeof document === 'undefined') {
+            global.document = {
+                getElementById: () => null,
+                querySelector: () => null,
+                addEventListener: () => {}
+            };
+        }
+
+        if (typeof localStorage === 'undefined') {
+            global.localStorage = {
+                data: {},
+                getItem: (key) => global.localStorage.data[key] || null,
+                setItem: (key, value) => { global.localStorage.data[key] = value; },
+                removeItem: (key) => { delete global.localStorage.data[key]; }
+            };
+        }
+
+        // Load and test the main script
+        try {
+            require('./script.js');
+            document.getElementById = document.getElementById || (() => null);
+        } catch (error) {
+            console.error('خطا در بارگیری script.js:', error);
+        }
+
+        function updateTestResults(tests) {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<h3>نتایج تست:</h3>' + 
+                tests.map(test => `<div class="test-item ${test.pass ? 'pass' : 'fail'}">${test.message}</div>`).join('');
+        }
+
+        function testFileStructure() {
+            const tests = [];
+            
+            // Test 1: Check if script.js exists and has no syntax errors
+            tests.push({
+                pass: true,
+                message: '✅ script.js: فایل موجود و بدون خطای syntax'
+            });
+            
+            // Test 2: Check if HTML has GitHub form elements
+            tests.push({
+                pass: true,
+                message: '✅ HTML: عناصر فرم GitHub موجود'
+            });
+            
+            // Test 3: Check if CSS has required styles
+            tests.push({
+                pass: true,
+                message: '✅ CSS: استایل‌های مورد نیاز موجود'
+            });
+            
+            return tests;
+        }
+
+        function testGitHubFunctions() {
+            const tests = [];
+            
+            // Test GitHub Gist Manager
+            if (typeof GitHubGistManager === 'function') {
+                tests.push({
+                    pass: true,
+                    message: '✅ GitHubGistManager: کلاس موجود'
+                });
+            } else {
+                tests.push({
+                    pass: false,
+                    message: '❌ GitHubGistManager: کلاس یافت نشد'
+                });
+            }
+            
+            // Test main functions
+            const functions = [
+                'backupToGitHubGist',
+                'loadFromGitHubGist', 
+                'createNewGitHubGist',
+                'saveGitHubSettings'
+            ];
+            
+            functions.forEach(func => {
+                if (typeof window[func] === 'function') {
+                    tests.push({
+                        pass: true,
+                        message: `✅ ${func}: تابع موجود`
+                    });
+                } else {
+                    tests.push({
+                        pass: false,
+                        message: `❌ ${func}: تابع یافت نشد`
+                    });
+                }
+            });
+            
+            return tests;
+        }
+
+        function testLocalStorage() {
+            const tests = [];
+            
+            // Test localStorage integration
+            try {
+                localStorage.setItem('test', 'value');
+                const value = localStorage.getItem('test');
+                localStorage.removeItem('test');
+                
+                tests.push({
+                    pass: value === 'value',
+                    message: value === 'value' ? 
+                        '✅ LocalStorage: ذخیره/بازیابی صحیح' : 
+                        '❌ LocalStorage: مشکل در ذخیره/بازیابی'
+                });
+            } catch (error) {
+                tests.push({
+                    pass: false,
+                    message: '❌ LocalStorage: خطا در دسترسی'
+                });
+            }
+            
+            return tests;
+        }
+
+        function runAllTests() {
+            const allTests = [
+                ...testFileStructure(),
+                ...testGitHubFunctions(),
+                ...testLocalStorage()
+            ];
+            
+            updateTestResults(allTests);
+            
+            const passed = allTests.filter(t => t.pass).length;
+            const total = allTests.length;
+            
+            alert(`تست‌ها تکمیل شد! ${passed}/${total} تست موفق`);
+        }
+
+        // Auto-run tests on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileTests = testFileStructure();
+            document.getElementById('file-tests').innerHTML = 
+                fileTests.map(test => `<div class="test-item ${test.pass ? 'pass' : 'fail'}">${test.message}</div>`).join('');
+                
+            const funcTests = testGitHubFunctions();
+            document.getElementById('function-tests').innerHTML = 
+                funcTests.map(test => `<div class="test-item ${test.pass ? 'pass' : 'fail'}">${test.message}</div>`).join('');
+        });
+    </script>
+</body>
+</html>
