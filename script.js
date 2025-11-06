@@ -406,7 +406,6 @@ function renderInventory() {
     
     inventory.forEach(item => {
         const row = document.createElement('tr');
-        const stockClass = item.finalStock <= 0 ? 'low-stock' : '';
         const stockColor = item.finalStock <= 0 ? '#EF4444' : item.finalStock <= 10 ? '#F59E0B' : '#22C55E';
         
         row.innerHTML = `
@@ -439,8 +438,8 @@ function showInvoiceModal(action, id, type = 'input') {
     productsContainer.innerHTML = '<div class="product-row"></div>';
     addProductRow(productsContainer.querySelector('.product-row'));
     
-    // Set date to today
-    const today = new Date();
+    // Set date to today (1404)
+    const today = new Date('2024-10-27'); // 1404/08/06 equivalent
     dateInput.value = formatDateToPersian(today);
     
     // Set modal data
@@ -862,7 +861,7 @@ function backupData() {
         
         const a = document.createElement('a');
         a.href = url;
-        a.download = `inventory-backup-${formatDateToPersian(new Date())}.json`;
+        a.download = `inventory-backup-${formatDateToPersian(new Date('2024-10-27'))}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -938,7 +937,7 @@ async function syncWithGitHub() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                message: `Update inventory data - ${formatDateToPersian(new Date())}`,
+                message: `Update inventory data - ${formatDateToPersian(new Date('2024-10-27'))}`,
                 content: encodedData
             })
         });
@@ -991,9 +990,51 @@ function initializeButtonHandlers() {
     document.getElementById('sync-github').addEventListener('click', syncWithGitHub);
 }
 
+// Mobile Menu Management
+function initializeMobileMenu() {
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobile-overlay');
+    
+    function openMobileMenu() {
+        sidebar.classList.add('mobile-open');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeMobileMenu() {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Add event listeners
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', openMobileMenu);
+    }
+    
+    if (overlay) {
+        overlay.addEventListener('click', closeMobileMenu);
+    }
+    
+    // Close menu when clicking on nav items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', closeMobileMenu);
+    });
+    
+    // Close menu on window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            closeMobileMenu();
+        }
+    });
+}
+
 // Initialize Application
 function initializeApp() {
     loadData();
+    initializeMobileMenu();
     initializeTabs();
     initializeModalHandlers();
     initializeButtonHandlers();
@@ -1023,11 +1064,3 @@ function initializeApp() {
 
 // Start the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', initializeApp);
-
-// Add fix for the missing method in Sales 168 table
-Object.defineProperty(HTMLCollection.prototype, 'queryAll', {
-    value: function(selector) {
-        return Array.prototype.slice.call(this).filter(el => el.querySelector && el.querySelector(selector));
-    },
-    enumerable: false
-});
