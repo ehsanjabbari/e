@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت موجودی فروشگاه</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>مدیریت موجودی</h1>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-tab="products">
+                    <i data-lucide="package"></i>
+                    <span>محصولات</span>
+                </li>
+                <li class="nav-item" data-tab="input-invoices">
+                    <i data-lucide="file-plus"></i>
+                    <span>فاکتورهای ورودی</span>
+                </li>
+                <li class="nav-item" data-tab="sales-151">
+                    <i data-lucide="shopping-cart"></i>
+                    <span>فروش151</span>
+                </li>
+                <li class="nav-item" data-tab="sales-168">
+                    <i data-lucide="trending-up"></i>
+                    <span>فروش168</span>
+                </li>
+                <li class="nav-item" data-tab="inventory">
+                    <i data-lucide="archive"></i>
+                    <span>موجودی</span>
+                </li>
+                <li class="nav-item" data-tab="settings">
+                    <i data-lucide="settings"></i>
+                    <span>مدیریت اطلاعات</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Products Tab -->
+            <div id="products" class="tab-content active">
+                <div class="content-header">
+                    <h2>مدیریت محصولات</h2>
+                    <button class="primary-btn" id="add-product">
+                        <i data-lucide="plus"></i>
+                        افزودن محصول
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="products-table">
+                        <thead>
+                            <tr>
+                                <th>نام محصول</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Products will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Input Invoices Tab -->
+            <div id="input-invoices" class="tab-content">
+                <div class="content-header">
+                    <h2>فاکتورهای ورودی</h2>
+                    <button class="primary-btn" id="add-input-invoice">
+                        <i data-lucide="plus"></i>
+                        افزودن فاکتور ورودی
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="input-invoices-table">
+                        <thead>
+                            <tr>
+                                <th>تاریخ</th>
+                                <th>محصولات</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Input invoices will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sales 151 Tab -->
+            <div id="sales-151" class="tab-content">
+                <div class="content-header">
+                    <h2>فروش151</h2>
+                    <button class="primary-btn" id="add-sale-151">
+                        <i data-lucide="plus"></i>
+                        افزودن فاکتور فروش
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="sales-151-table">
+                        <thead>
+                            <tr>
+                                <th>تاریخ</th>
+                                <th>محصولات</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sales 151 will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sales 168 Tab -->
+            <div id="sales-168" class="tab-content">
+                <div class="content-header">
+                    <h2>فروش168</h2>
+                    <button class="primary-btn" id="add-sale-168">
+                        <i data-lucide="plus"></i>
+                        افزودن فاکتور فروش
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="sales-168-table">
+                        <thead>
+                            <tr>
+                                <th>تاریخ</th>
+                                <th>محصولات</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sales 168 will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Inventory Tab -->
+            <div id="inventory" class="tab-content">
+                <div class="content-header">
+                    <h2>موجودی کالا</h2>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>نام کالا</th>
+                                <th>تعداد ورودی</th>
+                                <th>تعداد فروش</th>
+                                <th>موجودی نهایی</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Inventory will be dynamically calculated and displayed here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="content-header">
+                    <h2>مدیریت اطلاعات</h2>
+                </div>
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>بکاپ و رستور</h3>
+                        <div class="settings-actions">
+                            <button class="secondary-btn" id="backup-data">
+                                <i data-lucide="download"></i>
+                                بکاپ گرفتن
+                            </button>
+                            <input type="file" id="restore-file" accept=".json" style="display: none;">
+                            <button class="secondary-btn" id="restore-data">
+                                <i data-lucide="upload"></i>
+                                رستور بکاپ
+                            </button>
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <h3>ادغام با GitHub</h3>
+                        <div class="form-group">
+                            <label for="github-token">توکن GitHub:</label>
+                            <input type="password" id="github-token" placeholder="توکن شخصی خود را وارد کنید">
+                        </div>
+                        <div class="form-group">
+                            <label for="github-repo">نام مخزن:</label>
+                            <input type="text" id="github-repo" placeholder="نام مخزن (مثال: my-inventory)">
+                        </div>
+                        <div class="form-group">
+                            <label for="github-username">نام کاربری:</label>
+                            <input type="text" id="github-username" placeholder="نام کاربری GitHub">
+                        </div>
+                        <div class="settings-actions">
+                            <button class="primary-btn" id="sync-github">
+                                <i data-lucide="sync"></i>
+                                همگام سازی
+                            </button>
+                        </div>
+                        <div id="github-status" class="status-message"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Add/Edit Product -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="product-modal-title">افزودن محصول</h3>
+                <button class="close-btn" data-lucide="x"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="product-name">نام محصول:</label>
+                    <input type="text" id="product-name" placeholder="نام محصول را وارد کنید">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-btn" data-action="cancel">لغو</button>
+                <button class="primary-btn" data-action="save">ثبت</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Invoice -->
+    <div id="invoice-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="invoice-modal-title">افزودن فاکتور</h3>
+                <button class="close-btn" data-lucide="x"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="invoice-date">تاریخ:</label>
+                    <input type="text" id="invoice-date" placeholder="مثال: 1404/08/16">
+                </div>
+                <div class="form-group">
+                    <label>محصولات:</label>
+                    <div id="invoice-products">
+                        <div class="product-row">
+                            <select class="product-select">
+                                <option value="">انتخاب محصول</option>
+                            </select>
+                            <input type="number" class="product-quantity" placeholder="تعداد" min="1">
+                            <button class="remove-product-btn" data-lucide="trash-2"></button>
+                        </div>
+                    </div>
+                    <button class="secondary-btn" id="add-product-row">
+                        <i data-lucide="plus"></i>
+                        افزودن محصول
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-btn" data-action="cancel">لغو</button>
+                <button class="primary-btn" data-action="save">ثبت</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>تأیید حذف</h3>
+            </div>
+            <div class="modal-body">
+                <p>آیا مطمئن هستید که می‌خواهید این مورد را حذف کنید؟</p>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-btn" data-action="cancel">لغو</button>
+                <button class="danger-btn" data-action="confirm">حذف</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
