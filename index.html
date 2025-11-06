@@ -3,7 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدیریت موجودی فروشگاه</title>
+    <title>elishoes - مدیریت موجودی فروشگاه</title>
+    
+    <!-- PWA and iOS specific meta tags -->
+    <meta name="description" content="سیستم مدیریت موجودی فروشگاه با قابلیت هماهنگ‌سازی GitHub">
+    <meta name="application-name" content="elishoes">
+    <meta name="apple-mobile-web-app-title" content="elishoes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-TileColor" content="#dc2626">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="theme-color" content="#dc2626">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="shortcut icon" href="icons/favicon-32x32.png">
+    
+    <!-- Apple Touch Icons for iOS -->
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-180x180.png">
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+    
+    <!-- Android Chrome -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/android-chrome-512x512.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Standard links -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -316,6 +346,73 @@
     <script src="script.js"></script>
     <script>
         lucide.createIcons();
+        
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New update available
+                                    if (confirm('نسخه جدید برنامه موجود است. آیا می‌خواهید به‌روزرسانی شود؟')) {
+                                        newWorker.postMessage({ action: 'skipWaiting' });
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+        
+        // iOS PWA installation prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button (optional)
+            const installBtn = document.createElement('button');
+            installBtn.textContent = 'نصب در صفحه اصلی';
+            installBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #dc2626; color: white; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; z-index: 1000; font-family: Vazirmatn; font-size: 14px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);';
+            installBtn.onclick = () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted PWA install');
+                        }
+                        deferredPrompt = null;
+                        installBtn.remove();
+                    });
+                }
+            };
+            document.body.appendChild(installBtn);
+            
+            // Remove button after 30 seconds
+            setTimeout(() => {
+                if (installBtn.parentNode) {
+                    installBtn.remove();
+                }
+            }, 30000);
+        });
+        
+        // iOS PWA launch
+        window.addEventListener('DOMContentLoaded', () => {
+            // iOS standalone detection
+            const isInStandaloneMode = (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches);
+            console.log('iOS PWA mode:', isInStandaloneMode);
+        });
     </script>
 </body>
 </html>

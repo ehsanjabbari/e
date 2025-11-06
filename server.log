@@ -1,0 +1,11 @@
+nohup: ignoring input
+127.0.0.1 - - [07/Nov/2025 02:11:38] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2025 02:11:38] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2025 02:11:38] "GET /script.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2025 02:11:39] "GET /sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2025 02:11:39] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2025 02:11:39] "GET /icons/icon-192x192.png HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2025 02:11:39] "GET /manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2025 02:11:39] "GET /icons/icon-512x512.png HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2025 02:11:39] "GET /icons/apple-touch-icon-120x120.png HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2025 02:11:39] "GET /icons/apple-touch-icon-180x180.png HTTP/1.1" 200 -
