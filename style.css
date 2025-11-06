@@ -645,3 +645,39 @@ select:focus {
         border: 1px solid #ccc;
     }
 }
+
+/* Gist specific styles */
+.gist-success {
+    background: #f0f9ff;
+    border: 1px solid #0ea5e9;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.gist-success p {
+    margin: 5px 0;
+}
+
+.gist-info {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.gist-info p {
+    margin: 8px 0 4px 0;
+}
+
+.gist-info ol {
+    margin: 10px 0 0 20px;
+    padding: 0;
+}
+
+.gist-info li {
+    margin: 6px 0;
+    line-height: 1.5;
+}
