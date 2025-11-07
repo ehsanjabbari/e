@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>elishoes - مدیریت موجودی فروشگاه</title>
+    
+    <!-- PWA and iOS specific meta tags -->
+    <meta name="description" content="سیستم مدیریت موجودی فروشگاه با قابلیت هماهنگ‌سازی GitHub">
+    <meta name="application-name" content="elishoes">
+    <meta name="apple-mobile-web-app-title" content="elishoes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-TileColor" content="#dc2626">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="theme-color" content="#dc2626">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="shortcut icon" href="icons/favicon-32x32.png">
+    
+    <!-- Apple Touch Icons for iOS -->
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/apple-touch-icon-192x192.png">
+    
+    <!-- Android Chrome -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/android-chrome-512x512.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Standard links -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Mobile menu toggle button -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn">
+        <i data-lucide="menu"></i>
+    </button>
+    
+    <!-- Mobile overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+    
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>مدیریت موجودی</h1>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-tab="products">
+                    <i data-lucide="package"></i>
+                    <span>محصولات</span>
+                </li>
+                <li class="nav-item" data-tab="input-invoices">
+                    <i data-lucide="file-plus"></i>
+                    <span>فاکتورهای ورودی</span>
+                </li>
+                <li class="nav-item" data-tab="sales-151">
+                    <i data-lucide="shopping-cart"></i>
+                    <span>فروش151</span>
+                </li>
+                <li class="nav-item" data-tab="sales-168">
+                    <i data-lucide="trending-up"></i>
+                    <span>فروش168</span>
+                </li>
+                <li class="nav-item" data-tab="inventory">
+                    <i data-lucide="archive"></i>
+                    <span>موجودی</span>
+                </li>
+                <li class="nav-item" data-tab="settings">
+                    <i data-lucide="settings"></i>
+                    <span>مدیریت اطلاعات</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Products Tab -->
+            <div id="products" class="tab-content active">
+                <div class="content-header">
+                    <h2>مدیریت محصولات</h2>
+                    <button class="primary-btn" id="add-product">
+                        <i data-lucide="plus"></i>
+                        افزودن محصول
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="products-table">
+                        <thead>
+                            <tr>
+                                <th>نام محصول</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Products will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Input Invoices Tab -->
+            <div id="input-invoices" class="tab-content">
+                <div class="content-header">
+                    <h2>فاکتورهای ورودی</h2>
+                    <button class="primary-btn" id="add-input-invoice">
+                        <i data-lucide="plus"></i>
+                        افزودن فاکتور ورودی
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="input-invoices-table">
+                        <thead>
+                            <tr>
+                                <th>تاریخ</th>
+                                <th>محصولات</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Input invoices will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sales 151 Tab -->
+            <div id="sales-151" class="tab-content">
+                <div class="content-header">
+                    <h2>فروش151</h2>
+                    <button class="primary-btn" id="add-sale-151">
+                        <i data-lucide="plus"></i>
+                        افزودن فاکتور فروش
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="sales-151-table">
+                        <thead>
+                            <tr>
+                                <th>تاریخ</th>
+                                <th>محصولات</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sales 151 will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sales 168 Tab -->
+            <div id="sales-168" class="tab-content">
+                <div class="content-header">
+                    <h2>فروش168</h2>
+                    <button class="primary-btn" id="add-sale-168">
+                        <i data-lucide="plus"></i>
+                        افزودن فاکتور فروش
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="sales-168-table">
+                        <thead>
+                            <tr>
+                                <th>تاریخ</th>
+                                <th>محصولات</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sales 168 will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Inventory Tab -->
+            <div id="inventory" class="tab-content">
+                <div class="content-header">
+                    <h2>موجودی کالا</h2>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>نام کالا</th>
+                                <th>تعداد ورودی</th>
+                                <th>تعداد فروش</th>
+                                <th>موجودی نهایی</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Inventory will be dynamically calculated and displayed here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="content-header">
+                    <h2>مدیریت اطلاعات</h2>
+                </div>
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>بکاپ و رستور</h3>
+                        <div class="settings-actions">
+                            <button class="secondary-btn" id="backup-data">
+                                <i data-lucide="download"></i>
+                                بکاپ گرفتن
+                            </button>
+                            <input type="file" id="restore-file" accept=".json" style="display: none;">
+                            <button class="secondary-btn" id="restore-data">
+                                <i data-lucide="upload"></i>
+                                رستور بکاپ
+                            </button>
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <h3>📤 اشتراک‌گذاری GitHub</h3>
+                        <div class="settings-group">
+                            <label>توکن Personal Access:</label>
+                            <input type="password" id="github-token" placeholder="ghp_..." class="settings-input">
+                            <small class="settings-help">
+                                از GitHub > Settings > Developer settings > Personal access tokens
+                            </small>
+                        </div>
+                        <div class="settings-group">
+                            <label>شناسه Gist:</label>
+                            <input type="text" id="github-gist-id" placeholder="نشانی Gist یا فقط ID" class="settings-input">
+                            <small class="settings-help">
+                                اگر Gist وجود دارد، ID آن را وارد کنید
+                            </small>
+                        </div>
+                        <div class="settings-actions">
+                            <button class="primary-btn" onclick="saveGitHubSettings()">
+                                <i data-lucide="save"></i>
+                                ذخیره تنظیمات
+                            </button>
+                            <button class="secondary-btn" onclick="createNewGitHubGist()">
+                                <i data-lucide="plus"></i>
+                                ایجاد Gist جدید
+                            </button>
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <h3>🔄 همگام‌سازی</h3>
+                        <div class="settings-actions">
+                            <button class="primary-btn" onclick="backupToGitHubGist()">
+                                <i data-lucide="upload"></i>
+                                ارسال بکاپ به GitHub
+                            </button>
+                            <button class="secondary-btn" onclick="loadFromGitHubGist()">
+                                <i data-lucide="download"></i>
+                                بارگیری از GitHub
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Add/Edit Product -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="product-modal-title">افزودن محصول</h3>
+                <button class="close-btn" data-lucide="x"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="product-name">نام محصول:</label>
+                    <input type="text" id="product-name" placeholder="نام محصول را وارد کنید">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-btn" data-action="cancel">لغو</button>
+                <button class="primary-btn" data-action="save">ثبت</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Invoice -->
+    <div id="invoice-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="invoice-modal-title">افزودن فاکتور</h3>
+                <button class="close-btn" data-lucide="x"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="invoice-date">تاریخ:</label>
+                    <input type="text" id="invoice-date" placeholder="مثال: 1404/08/16">
+                </div>
+                <div class="form-group">
+                    <label>محصولات:</label>
+                    <div id="invoice-products">
+                        <div class="product-row">
+                            <select class="product-select">
+                                <option value="">انتخاب محصول</option>
+                            </select>
+                            <input type="number" class="product-quantity" placeholder="تعداد" min="1">
+                            <button class="remove-product-btn" data-lucide="trash-2"></button>
+                        </div>
+                    </div>
+                    <button class="secondary-btn" id="add-product-row">
+                        <i data-lucide="plus"></i>
+                        افزودن محصول
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-btn" data-action="cancel">لغو</button>
+                <button class="primary-btn" data-action="save">ثبت</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>تأیید حذف</h3>
+            </div>
+            <div class="modal-body">
+                <p>آیا مطمئن هستید که می‌خواهید این مورد را حذف کنید؟</p>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-btn" data-action="cancel">لغو</button>
+                <button class="danger-btn" data-action="confirm">حذف</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New update available
+                                    if (confirm('نسخه جدید برنامه موجود است. آیا می‌خواهید به‌روزرسانی شود؟')) {
+                                        newWorker.postMessage({ action: 'skipWaiting' });
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+        
+        // iOS PWA installation prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button (optional)
+            const installBtn = document.createElement('button');
+            installBtn.textContent = 'نصب در صفحه اصلی';
+            installBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #dc2626; color: white; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; z-index: 1000; font-family: Vazirmatn; font-size: 14px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);';
+            installBtn.onclick = () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted PWA install');
+                        }
+                        deferredPrompt = null;
+                        installBtn.remove();
+                    });
+                }
+            };
+            document.body.appendChild(installBtn);
+            
+            // Remove button after 30 seconds
+            setTimeout(() => {
+                if (installBtn.parentNode) {
+                    installBtn.remove();
+                }
+            }, 30000);
+        });
+        
+        // iOS PWA launch
+        window.addEventListener('DOMContentLoaded', () => {
+            // iOS standalone detection
+            const isInStandaloneMode = (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches);
+            console.log('iOS PWA mode:', isInStandaloneMode);
+        });
+    </script>
+</body>
+</html>
